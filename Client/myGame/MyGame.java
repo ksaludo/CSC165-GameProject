@@ -45,6 +45,8 @@ public class MyGame extends VariableFrameRateGame
 	private ProtocolClient protClient;
 	private boolean isClientConnected = false;
 
+	private int skyLines;
+
 	public MyGame(String serverAddress, int serverPort, String protocol)
 	{	super();
 		gm = new GhostManager(this);
@@ -77,6 +79,13 @@ public class MyGame extends VariableFrameRateGame
 	public void loadTextures()
 	{	doltx = new TextureImage("Dolphin_HighPolyUV.png");
 		ghostT = new TextureImage("redDolphin.jpg");
+	}
+
+	@Override
+	public void loadSkyBoxes() {
+		skyLines = (engine.getSceneGraph()).loadCubeMap("skyLines");
+		(engine.getSceneGraph()).setActiveSkyBoxTexture(skyLines);	
+		(engine.getSceneGraph()).setSkyBoxEnabled(true);
 	}
 
 	@Override
@@ -200,6 +209,25 @@ public class MyGame extends VariableFrameRateGame
 				Vector3f newPosition = oldPosition.add(fwdDirection.x(), fwdDirection.y(), fwdDirection.z());
 				avatar.setLocalLocation(newPosition);
 				protClient.sendMoveMessage(avatar.getWorldLocation());
+				break;
+			}
+			case KeyEvent.VK_S:
+			{	Vector3f oldPosition = avatar.getWorldLocation();
+				Vector4f fwdDirection = new Vector4f(0f,0f,1f,1f);
+				fwdDirection.mul(avatar.getWorldRotation());
+				fwdDirection.mul(-0.05f);
+				Vector3f newPosition = oldPosition.add(fwdDirection.x(), fwdDirection.y(), fwdDirection.z());
+				avatar.setLocalLocation(newPosition);
+				protClient.sendMoveMessage(avatar.getWorldLocation());
+				break;
+			}
+			case KeyEvent.VK_A:
+			{	Matrix4f oldRotation = new Matrix4f(avatar.getWorldRotation());
+				Vector4f oldUp = new Vector4f(0f,1f,0f,1f).mul(oldRotation);
+				Matrix4f rotAroundAvatarUp = new Matrix4f().rotation(0.01f, new Vector3f(oldUp.x(), oldUp.y(), oldUp.z()));
+				Matrix4f newRotation = oldRotation;
+				newRotation.mul(rotAroundAvatarUp);
+				avatar.setLocalRotation(newRotation);
 				break;
 			}
 			case KeyEvent.VK_D:
