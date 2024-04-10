@@ -34,9 +34,9 @@ public class MyGame extends VariableFrameRateGame
 	private Matrix4f initialTranslation, initialRotation, initialScale;
 	private double startTime, prevTime, elapsedTime, amt;
 
-	private GameObject tor, avatar, x, y, z;
-	private ObjShape torS, ghostS, dolS, linxS, linyS, linzS;
-	private TextureImage doltx, ghostT;
+	private GameObject tor, avatar, x, y, z, terr;
+	private ObjShape torS, ghostS, dolS, linxS, linyS, linzS, terrS;
+	private TextureImage doltx, ghostT, hillsMap, hills;
 	private Light light;
 
 	private String serverAddress;
@@ -73,12 +73,15 @@ public class MyGame extends VariableFrameRateGame
 		linxS = new Line(new Vector3f(0f,0f,0f), new Vector3f(3f,0f,0f));
 		linyS = new Line(new Vector3f(0f,0f,0f), new Vector3f(0f,3f,0f));
 		linzS = new Line(new Vector3f(0f,0f,0f), new Vector3f(0f,0f,-3f));
+		terrS = new TerrainPlane(1025);
 	}
 
 	@Override
 	public void loadTextures()
 	{	doltx = new TextureImage("Dolphin_HighPolyUV.png");
 		ghostT = new TextureImage("redDolphin.jpg");
+		hillsMap = new TextureImage("hillsmap.png");
+		hills = new TextureImage("hills.png");
 	}
 
 	@Override
@@ -113,6 +116,16 @@ public class MyGame extends VariableFrameRateGame
 		(x.getRenderStates()).setColor(new Vector3f(1f,0f,0f));
 		(y.getRenderStates()).setColor(new Vector3f(0f,1f,0f));
 		(z.getRenderStates()).setColor(new Vector3f(0f,0f,1f));
+
+		// build terrain
+		terr = new GameObject(GameObject.root(), terrS, hills);
+		initialTranslation = (new Matrix4f()).translation(0f,-0.5f,0f);
+		terr.setLocalTranslation(initialTranslation);
+		initialScale = (new Matrix4f()).scaling(45.0f, 15.0f, 45.0f);
+		terr.setLocalScale(initialScale);
+		terr.setHeightMap(hillsMap);
+		terr.getRenderStates().setTiling(1);
+		terr.getRenderStates().setTileFactor(10);
 	}
 
 	@Override
@@ -178,6 +191,11 @@ public class MyGame extends VariableFrameRateGame
 		im.update((float)elapsedTime);
 		positionCameraBehindAvatar();
 		processNetworking((float)elapsedTime);
+
+		// update avatar altitude
+		Vector3f loc = avatar.getWorldLocation();
+		float height = terr.getHeight(loc.x(), loc.z());
+		avatar.setLocalLocation(new Vector3f(loc.x(), height, loc.z()));
 	}
 
 	private void positionCameraBehindAvatar()
@@ -205,7 +223,7 @@ public class MyGame extends VariableFrameRateGame
 			{	Vector3f oldPosition = avatar.getWorldLocation();
 				Vector4f fwdDirection = new Vector4f(0f,0f,1f,1f);
 				fwdDirection.mul(avatar.getWorldRotation());
-				fwdDirection.mul(0.05f);
+				fwdDirection.mul(0.25f);
 				Vector3f newPosition = oldPosition.add(fwdDirection.x(), fwdDirection.y(), fwdDirection.z());
 				avatar.setLocalLocation(newPosition);
 				protClient.sendMoveMessage(avatar.getWorldLocation());
@@ -215,7 +233,7 @@ public class MyGame extends VariableFrameRateGame
 			{	Vector3f oldPosition = avatar.getWorldLocation();
 				Vector4f fwdDirection = new Vector4f(0f,0f,1f,1f);
 				fwdDirection.mul(avatar.getWorldRotation());
-				fwdDirection.mul(-0.05f);
+				fwdDirection.mul(-0.25f);
 				Vector3f newPosition = oldPosition.add(fwdDirection.x(), fwdDirection.y(), fwdDirection.z());
 				avatar.setLocalLocation(newPosition);
 				protClient.sendMoveMessage(avatar.getWorldLocation());
@@ -224,7 +242,7 @@ public class MyGame extends VariableFrameRateGame
 			case KeyEvent.VK_A:
 			{	Matrix4f oldRotation = new Matrix4f(avatar.getWorldRotation());
 				Vector4f oldUp = new Vector4f(0f,1f,0f,1f).mul(oldRotation);
-				Matrix4f rotAroundAvatarUp = new Matrix4f().rotation(0.01f, new Vector3f(oldUp.x(), oldUp.y(), oldUp.z()));
+				Matrix4f rotAroundAvatarUp = new Matrix4f().rotation(0.1f, new Vector3f(oldUp.x(), oldUp.y(), oldUp.z()));
 				Matrix4f newRotation = oldRotation;
 				newRotation.mul(rotAroundAvatarUp);
 				avatar.setLocalRotation(newRotation);
@@ -233,7 +251,7 @@ public class MyGame extends VariableFrameRateGame
 			case KeyEvent.VK_D:
 			{	Matrix4f oldRotation = new Matrix4f(avatar.getWorldRotation());
 				Vector4f oldUp = new Vector4f(0f,1f,0f,1f).mul(oldRotation);
-				Matrix4f rotAroundAvatarUp = new Matrix4f().rotation(-.01f, new Vector3f(oldUp.x(), oldUp.y(), oldUp.z()));
+				Matrix4f rotAroundAvatarUp = new Matrix4f().rotation(-.1f, new Vector3f(oldUp.x(), oldUp.y(), oldUp.z()));
 				Matrix4f newRotation = oldRotation;
 				newRotation.mul(rotAroundAvatarUp);
 				avatar.setLocalRotation(newRotation);
