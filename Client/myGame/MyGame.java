@@ -68,8 +68,8 @@ public class MyGame extends VariableFrameRateGame
 	@Override
 	public void loadShapes()
 	{	torS = new Torus(0.5f, 0.2f, 48);
-		ghostS = new ImportedModel("dolphinHighPoly.obj");
-		dolS = new ImportedModel("dolphinHighPoly.obj");
+		ghostS = new ImportedModel("car.obj");
+		dolS = new ImportedModel("car.obj");
 		linxS = new Line(new Vector3f(0f,0f,0f), new Vector3f(3f,0f,0f));
 		linyS = new Line(new Vector3f(0f,0f,0f), new Vector3f(0f,3f,0f));
 		linzS = new Line(new Vector3f(0f,0f,0f), new Vector3f(0f,0f,-3f));
@@ -78,8 +78,8 @@ public class MyGame extends VariableFrameRateGame
 
 	@Override
 	public void loadTextures()
-	{	doltx = new TextureImage("Dolphin_HighPolyUV.png");
-		ghostT = new TextureImage("redDolphin.jpg");
+	{	doltx = new TextureImage("car.png");
+		ghostT = new TextureImage("car.png");
 		hillsMap = new TextureImage("hillsmap.png");
 		hills = new TextureImage("hills.png");
 	}
@@ -99,8 +99,10 @@ public class MyGame extends VariableFrameRateGame
 		avatar = new GameObject(GameObject.root(), dolS, doltx);
 		initialTranslation = (new Matrix4f()).translation(-1f,0f,1f);
 		avatar.setLocalTranslation(initialTranslation);
-		initialRotation = (new Matrix4f()).rotationY((float)java.lang.Math.toRadians(135.0f));
+		initialRotation = (new Matrix4f()).rotationY((float)java.lang.Math.toRadians(67.5f));
 		avatar.setLocalRotation(initialRotation);
+		initialScale = (new Matrix4f()).scaling(0.20f);
+		avatar.setLocalScale(initialScale);
 
 		// build torus along X axis
 		tor = new GameObject(GameObject.root(), torS);
@@ -119,7 +121,7 @@ public class MyGame extends VariableFrameRateGame
 
 		// build terrain
 		terr = new GameObject(GameObject.root(), terrS, hills);
-		initialTranslation = (new Matrix4f()).translation(0f,-0.5f,0f);
+		initialTranslation = (new Matrix4f()).translation(0f,-0.25f,0f);
 		terr.setLocalTranslation(initialTranslation);
 		initialScale = (new Matrix4f()).scaling(45.0f, 15.0f, 45.0f);
 		terr.setLocalScale(initialScale);
