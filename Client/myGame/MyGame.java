@@ -81,7 +81,7 @@ public class MyGame extends VariableFrameRateGame
 	{	doltx = new TextureImage("car.png");
 		ghostT = new TextureImage("car.png");
 		hillsMap = new TextureImage("hillsmap.png");
-		hills = new TextureImage("hills.png");
+		hills = new TextureImage("hills.jpg");
 	}
 
 	@Override
@@ -123,7 +123,7 @@ public class MyGame extends VariableFrameRateGame
 		terr = new GameObject(GameObject.root(), terrS, hills);
 		initialTranslation = (new Matrix4f()).translation(0f,-0.25f,0f);
 		terr.setLocalTranslation(initialTranslation);
-		initialScale = (new Matrix4f()).scaling(45.0f, 15.0f, 45.0f);
+		initialScale = (new Matrix4f()).scaling(100.0f, 25.0f, 100.0f);
 		terr.setLocalScale(initialScale);
 		terr.setHeightMap(hillsMap);
 		terr.getRenderStates().setTiling(1);
